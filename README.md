@@ -1,22 +1,5 @@
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+//ARDUNIO_CODE
 
 
 
@@ -186,3 +169,221 @@ int pos = 0;
      myservo.write(pos);
      
     }
+
+
+
+
+
+
+
+
+
+
+
+//NODEMCU_CODE
+
+#define BLYNK_TEMPLATE_ID "TMPL3t-kk5uJr"
+#define BLYNK_TEMPLATE_NAME "Street light"
+#define BLYNK_AUTH_TOKEN 
+"8j4KnGIYEmMAvqA9CcbvtiUhMLZk98dv"
+#define BLYNK_PRINT Serial
+#include <ESP8266WiFi.h> 
+#include <BlynkSimpleEsp8266.h>
+char auth[] = BLYNK_AUTH_TOKEN;
+char ssid[] = "Nagu"; // Enter your Wifi Username
+char pass[] = "Nagu@213"; // Enter your Wifi password
+SimpleTimer timer;
+String myString; // complete message from arduino, which consistors of snesors 
+data
+char rdata; // received charactors
+int val1,val2,val3,val4,val5,val6;
+WidgetLED led1 (V0);
+WidgetLED led2 (V1);
+WidgetLED led3 (V2);
+WidgetLED led4 (V3);
+WidgetLED led5 (V2);
+WidgetLED led6 (V3);
+// This function sends Arduino’s up time every second to Virtual Pin (1).
+// In the app, Widget’s reading frequency should be set to PUSH. This means
+// that you define how often to send data to Blynk App.
+void myTimerEvent()
+{
+// You can send any value at any time.
+// Please don’t send more that 10 values per second.
+Blynk.virtualWrite(V1, millis() / 1000);
+}
+void setup()
+{
+// Debug console
+Serial.begin(9600);
+Blynk.begin(auth, ssid, pass, "blynk.cloud", 80);
+timer.setInterval(1000L,sensorvalue1); //mq135 
+timer.setInterval(1000L,sensorvalue2); //mq135
+timer.setInterval(1000L,sensorvalue3); //mq135
+timer.setInterval(1000L,sensorvalue4); //mq135
+//timer.setInterval(1000L,sensorvalue5); //mq135
+//timer.setInterval(1000L,sensorvalue6); //mq135
+}
+void loop()
+{
+if (Serial.available() == 0 )
+{
+Blynk.run();
+timer.run(); // Initiates BlynkTimer
+}
+if (Serial.available() > 0 )
+{
+rdata = Serial.read();
+myString = myString+ rdata;
+if( rdata == '\n')
+{
+String l = getValue(myString, ',', 0);
+String m = getValue(myString, ',', 1);
+String n = getValue(myString, ',', 2);
+String o = getValue(myString, ',', 3);
+String p = getValue(myString, ',', 4);
+String q = getValue(myString, ',', 5);
+// these leds represents the leds used in Blynk application
+val1 = l.toInt();
+val2 = m.toInt();
+val3 = n.toInt();
+val4 = o.toInt();
+val5 = p.toInt();
+val6 = q.toInt();
+myString = "";
+// end new code
+ }
+ }
+}
+void sensorvalue1()
+{
+int sdata = val1;
+if( sdata ==1){
+// Serial.println("light1 fail");
+ Blynk.logEvent("light1_");
+led1.off();
+}if( sdata ==0 ){
+ led1.on();
+}
+Serial.print( "sdata1:");
+ Serial.println( sdata);
+}
+void sensorvalue2()
+{
+int sdata = val2;
+if( sdata ==1){
+ //Serial.println("light2 fail");
+ Blynk.logEvent("light2");
+ led2.off();
+}if( sdata ==0){
+ led2.on();
+}
+ Serial.print( "sdata2:");
+ Serial.println( sdata);
+}
+void sensorvalue3()
+{
+int sdata = val3;
+if( sdata ==1){
+ //Serial.println("light3 fail");
+ led3.off();
+}if( sdata ==0){
+ led3.on();
+}
+ 
+ Serial.print( "sdata3:");
+ Serial.println( sdata);
+}
+void sensorvalue4()
+{
+int sdata = val4;
+if( sdata ==1){
+// Serial.println("light4 fail");
+ led4.off();
+}if( sdata ==0){
+ led4.on();
+}
+ Serial.print( "sdata4:");
+ Serial.println( sdata);
+}
+/*void sensorvalue5()
+{
+int sdata = val5;
+if( sdata ==1){
+ //Serial.println("light5 fail");
+ led5.off();
+}if( sdata ==0){
+ led5.on();
+}
+ Serial.print( "sdata5:");
+ Serial.println( sdata);
+}
+void sensorvalue6()
+{
+int sdata = val6;
+if( sdata ==1){
+ //Serial.println("light6 fail");
+led6.off();
+}if( sdata ==0){
+ led6.on();
+}
+Serial.print( "sdata6:");
+ Serial.println( sdata);
+}
+void sensorvalue7()
+{
+int sdata = val7;
+if(val1==0 && val2==0&&val3==0 && val4==0&&val5==0 && val6==0 && 
+val7 >=15){
+led1.off();
+led2.off();
+led3.off();
+led4.off();
+led5.off();
+led6.off();
+ 
+}
+Serial.print( "sdata7:");
+ Serial.println( sdata);
+}
+void sensorvalue8()
+{
+int sdata = val8;
+if(sdata==0){
+Blynk.logEvent("power_off");
+}
+Serial.print( "sdata8:");
+ Serial.println( sdata);
+}
+*/
+/*String getValue(String data, char separator, int index)
+{
+int found = 0;
+int strIndex[] = { 0, -1 };
+int maxIndex = data.length() - 1;
+for (int i = 0; i <= maxIndex && found <= index; i++) {
+if (data.charAt(i) == separator || i == maxIndex) {
+found++;
+strIndex[0] = strIndex[1] + 1;
+strIndex[1] = (i == maxIndex) ? i+1 : i;
+ }
+ }
+return found > index ? data.substring(strIndex[0], strIndex[1]) : "";
+}*/
+String getValue(String data, char separator, int index) {
+ int found = 0;
+ int strIndex[] = { 0, -1 };
+ int maxIndex = data.length() - 1;
+ // Iterate through the characters of the string
+ for (int i = 0; i <= maxIndex && found <= index; i++) {
+ // Check if the current character is the separator or if it's the last character
+ if (data.charAt(i) == separator || i == maxIndex) {
+ found++; // Increment the counter for found separators
+ strIndex[0] = strIndex[1] + 1; // Set the start index of the next substring
+ strIndex[1] = (i == maxIndex) ? i + 1 : i; // Set the end index of the current 
+substring
+ }
+ }
+ // Check if the requested index was found
+ // If found, return the substring, otherwise return an empty string
+ return found > index ? data.substring(strIndex[0], strIndex[1]) : "";
